@@ -23,7 +23,7 @@ main =
 type Model
     = Failure
     | Loading
-    | Success HNJob
+    | Success Story
 
 
 
@@ -39,8 +39,8 @@ init _ =
         { body = Http.emptyBody
         , method = "GET"
         , headers = []
-        , url = "https://hacker-news.firebaseio.com/v0/item/192327.json"
-        , expect = Http.expectJson GotJson hnDecoder
+        , url = "http://laptop-3qkgiicm:8080/"
+        , expect = Http.expectJson GotJson storyDecoder
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -48,7 +48,7 @@ init _ =
 
 
 type Msg
-    = GotJson (Result Http.Error HNJob)
+    = GotJson (Result Http.Error Story)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,68 +77,59 @@ view model =
         Loading ->
             Html.text "Loading"
 
-        Success hnjob ->
-            v hnjob
+        Success story ->
+            v story
 
 
-type alias HNJob =
-    { by : String
-    , id : Int
-    , score : Int
-    , text : String
+type alias Story =
+    { author : String
     , title : String
-    , time : Int
-    , url : String
+    , subtitle : String
+    , domain : String
     }
 
 
-hnDecoder : Decoder HNJob
-hnDecoder =
-    Decode.succeed HNJob
-        |> required "by" string
-        |> required "id" int
-        |> required "score" int
-        |> required "text" string
+storyDecoder : Decoder Story
+storyDecoder =
+    Decode.succeed Story
+        |> required "author" string
         |> required "title" string
-        |> required "time" int
-        |> required "url" string
+        |> required "subtitle" string
+        |> required "domain" string
 
 
-hnresult : String -> Result Decode.Error HNJob
-hnresult =
+storyResult : String -> Result Decode.Error Story
+storyResult =
     Decode.decodeString
-        hnDecoder
+        storyDecoder
 
 
-v hnjob =
-    Element.layout [] (vr hnjob)
+v story =
+    Element.layout [] (vr story)
 
 
-vr : HNJob -> Element msg
-vr hnjob =
+vr : Story -> Element msg
+vr story =
     Element.wrappedRow [ width fill, Font.size 14 ]
-        [ Element.el [ spacing 5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (text hnjob.title)
-        , Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink hnjob.title)
-        , Element.el [ Border.color (rgb255 240 140 255), Border.solid ] (text hnjob.title)
+        [ Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
+        , Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
+        , Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
         ]
 
 
-cardLink : String -> Element msg
-cardLink title =
+cardLink : Story -> Element msg
+cardLink story =
     Element.newTabLink []
         { url = "https://crawfordc.com"
-        , label = card title
+        , label = card story
         }
 
 
-card : String -> Element msg
-card title =
+card : Story -> Element msg
+card story =
     Element.column
         [ Border.color (rgb255 150 150 150), spacing 5, padding 5 ]
-        [ Element.image
-            [ width (fill |> maximum 300 |> minimum 150)
-            , height (fill |> maximum 300 |> minimum 150)
-            ]
-            { description = "ad", src = "https://cdn4.buysellads.net/uu/1/54614/1569954897-microsoft-azure-logo-260x200.png" }
-        , Element.paragraph [] [ Element.text title ]
+        [ Element.el [Font.size 18, Font.bold] (Element.text story.title)
+        , Element.el [Font.italic] (Element.paragraph [] [Element.text story.subtitle])
+        , Element.el [] (Element.text (String.concat[ "by: " ,story.author]) )
         ]

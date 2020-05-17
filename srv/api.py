@@ -5,25 +5,25 @@ import ujson
 app = falcon.API()
 
 
-class ReturnThree(object):
+class RandomThree(object):
     def on_get(self, req, resp):
         resp.set_header('Access-Control-Allow-Origin', '*')
-       # allow = resp.get_header('Allow')
-        #resp.delete_header('Allow')
+        with sqlite.connect("file:../data/inbrain.db?mode=ro", uri=True) as conn:
+            dict_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
+            conn.row_factory = dict_factory
+
+            result = conn.execute("SELECT * FROM stories ORDER BY RANDOM() LIMIT 3").fetchall()
+
+
+
 
 
         resp.status = falcon.HTTP_200
-        body = {"author" :"crawford c"
-                , "title" : "git Help"
-                , "subtitle": "solving common git problems"
-                , "domain" :"crawfordc.com"
-                , "url" : "book.crawfordc.com"
-                }
-
+        body = result
         resp.body = ujson.dumps(body)
 
 
 
-return_three = ReturnThree()
+random_three = RandomThree()
 
-app.add_route("/",return_three)
+app.add_route("/random_three",random_three)

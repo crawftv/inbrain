@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import falcon
 import ujson
+import sqlite3
 
 app = falcon.API()
 
@@ -8,7 +9,7 @@ app = falcon.API()
 class RandomThree(object):
     def on_get(self, req, resp):
         resp.set_header('Access-Control-Allow-Origin', '*')
-        with sqlite.connect("file:../data/inbrain.db?mode=ro", uri=True) as conn:
+        with sqlite3.connect("file:data/inbrain.db?mode=ro", uri=True) as conn:
             dict_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
             conn.row_factory = dict_factory
 
@@ -19,7 +20,7 @@ class RandomThree(object):
 
 
         resp.status = falcon.HTTP_200
-        body = result
+        body = {"results" : result}
         resp.body = ujson.dumps(body)
 
 

@@ -23,7 +23,7 @@ main =
 type Model
     = Failure
     | Loading
-    | Success Story
+    | Success StoryList
 
 
 
@@ -39,8 +39,8 @@ init _ =
         { body = Http.emptyBody
         , method = "GET"
         , headers = []
-        , url = "http://laptop-3qkgiicm:8080/"
-        , expect = Http.expectJson GotJson storyDecoder
+        , url = "http://laptop-3qkgiicm:8080/random_three"
+        , expect = Http.expectJson GotJson threeDecoder
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -48,7 +48,7 @@ init _ =
 
 
 type Msg
-    = GotJson (Result Http.Error Story)
+    = GotJson (Result Http.Error StoryList)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,8 +77,8 @@ view model =
         Loading ->
             Html.text "Loading"
 
-        Success story ->
-            v story
+        Success fullText ->
+            v fullText
 
 
 type alias Story =
@@ -86,7 +86,18 @@ type alias Story =
     , title : String
     , subtitle : String
     , domain : String
+    , url : String
     }
+
+
+type alias StoryList =
+    { storyList : List Story }
+
+
+threeDecoder : Decoder StoryList
+threeDecoder =
+    Decode.succeed StoryList
+        |> required "results" (list storyDecoder)
 
 
 storyDecoder : Decoder Story
@@ -96,40 +107,45 @@ storyDecoder =
         |> required "title" string
         |> required "subtitle" string
         |> required "domain" string
+        |> required "url" string
 
 
-storyResult : String -> Result Decode.Error Story
-storyResult =
-    Decode.decodeString
-        storyDecoder
+v : StoryList -> Html.Html Msg
+v storyList =
+    Element.layout [] (map_v storyList)
 
 
-v story =
-    Element.layout [] (vr story)
+map_v : StoryList -> Element msg
+map_v storyList =
+    Element.wrappedRow [] (List.map vr storyList.storyList)
 
 
 vr : Story -> Element msg
 vr story =
-    Element.wrappedRow [ width fill, Font.size 14 ]
-        [ Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
-        , Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
-        , Element.el [ Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
+    Element.wrappedRow [ ]
+        [ Element.el [ Element.width (Element.px 180), Element.height (Element.px 180), Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
         ]
 
 
 cardLink : Story -> Element msg
 cardLink story =
     Element.newTabLink []
-        { url = "https://crawfordc.com"
+        { url = story.url
         , label = card story
         }
 
+edges =
+    { top =5 
+    , right = 5
+    , bottom = 5
+    , left = 5
+    }
 
 card : Story -> Element msg
 card story =
-    Element.column
-        [ Border.color (rgb255 150 150 150), spacing 5, padding 5 ]
-        [ Element.el [Font.size 18, Font.bold] (Element.text story.title)
-        , Element.el [Font.italic] (Element.paragraph [] [Element.text story.subtitle])
-        , Element.el [] (Element.text (String.concat[ "by: " ,story.author]) )
+    Element.paragraph
+        [ Border.color (rgb255 150 150 150), spacing 15, Element.paddingEach {edges | top = 10}]
+        [ Element.el [ Font.size 18, Font.bold ] (Element.text story.title)
+        , Element.el [ Font.italic, Font.size 14 ] (Element.paragraph [ Element.paddingEach {top=5,right=0,left=0,bottom=0} ] [ Element.text story.subtitle ])
+        , Element.el [ Font.size 12 ] (Element.text (String.concat [ "by: ", story.author ]))
         ]

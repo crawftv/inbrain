@@ -1,12 +1,12 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
-import Element exposing (Element, el, fill, height, maximum, minimum, padding, rgb255, row, shrink, spaceEvenly, spacing, text, width)
+import Element exposing (Element)
 import Element.Border as Border
 import Element.Font as Font
 import Html
 import Http
-import Json.Decode as Decode exposing (Decoder, field, int, list, map2, string)
+import Json.Decode as Decode exposing (Decoder, list, string)
 import Json.Decode.Pipeline exposing (required)
 
 
@@ -122,8 +122,8 @@ map_v storyList =
 
 vr : Story -> Element msg
 vr story =
-    Element.wrappedRow [ ]
-        [ Element.el [ Element.width (Element.px 180), Element.height (Element.px 180), Border.rounded 3, Border.glow (rgb255 0 0 0) 0.5, Border.color (rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
+    Element.wrappedRow []
+        [ Element.el [ Element.width (Element.px 180), Element.height (Element.px 180), Border.rounded 3, Border.glow (Element.rgb255 0 0 0) 0.5, Border.color (Element.rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
         ]
 
 
@@ -134,18 +134,12 @@ cardLink story =
         , label = card story
         }
 
-edges =
-    { top =5 
-    , right = 5
-    , bottom = 5
-    , left = 5
-    }
 
 card : Story -> Element msg
 card story =
     Element.paragraph
-        [ Border.color (rgb255 150 150 150), spacing 15, Element.paddingEach {edges | top = 10}]
+        [ Border.color (Element.rgb255 150 150 150), Element.spacing 15, Element.paddingEach { top = 10, right = 0, left = 0, bottom = 0 } ]
         [ Element.el [ Font.size 18, Font.bold ] (Element.text story.title)
-        , Element.el [ Font.italic, Font.size 14 ] (Element.paragraph [ Element.paddingEach {top=5,right=0,left=0,bottom=0} ] [ Element.text story.subtitle ])
+        , Element.el [ Font.italic, Font.size 14 ] (Element.paragraph [ Element.paddingEach { top = 5, right = 0, left = 0, bottom = 0 } ] [ Element.text story.subtitle ])
         , Element.el [ Font.size 12 ] (Element.text (String.concat [ "by: ", story.author ]))
         ]

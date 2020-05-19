@@ -11,6 +11,7 @@ import Json.Decode.Pipeline exposing (required)
 import RemoteData exposing (RemoteData(..), WebData)
 import RemoteData.Http
 
+
 main : Program () Model Msg
 main =
     Browser.element
@@ -22,28 +23,29 @@ main =
 
 
 type alias Model =
-   { storyList : WebData StoryList }
+    { storyList : WebData StoryList }
+
 
 type Msg
     = HandleResponse (WebData StoryList)
     | GotJson
 
+
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {storyList = Loading}
+    ( { storyList = Loading }
     , RemoteData.Http.getWithConfig RemoteData.Http.defaultConfig "http://localhost:8080/random_three" HandleResponse threeDecoder
     )
-
-
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotJson ->
-            ( model,Cmd.none)
+            ( model, Cmd.none )
+
         HandleResponse data ->
-            ( {model | storyList = data}, Cmd.none )
+            ( { model | storyList = data }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -54,7 +56,7 @@ subscriptions model =
 view : Model -> Html.Html Msg
 view model =
     case model.storyList of
-        Failure  error->
+        Failure error ->
             decodeError error
 
         Loading ->
@@ -66,19 +68,25 @@ view model =
         NotAsked ->
             Html.text "Not Asked"
 
+
 decodeError : Http.Error -> Html.Html Msg
 decodeError error =
     case error of
         Http.BadUrl string ->
-            Html.text "Bad url"
+            Html.text ("Error: " ++ string)
+
         Http.Timeout ->
             Html.text "timeout"
+
         Http.NetworkError ->
             Html.text "network error"
+
         Http.BadStatus int ->
-            Html.text "bad status"
-        Http.BadBody string->
-            Html.text "Bad body"
+            Html.text ("Error: " ++ String.fromInt int)
+
+        Http.BadBody string ->
+            Html.text ("Error: " ++ string)
+
 
 type alias Story =
     { author : String
@@ -122,7 +130,16 @@ map_v storyList =
 vr : Story -> Element msg
 vr story =
     Element.wrappedRow []
-        [ Element.el [ Element.width (Element.px 180), Element.height (Element.px 180), Border.rounded 3, Border.glow (Element.rgb255 0 0 0) 0.5, Border.color (Element.rgb255 0 0 0), Border.solid, Border.width 1 ] (cardLink story)
+        [ Element.el
+            [ Element.width (Element.px 180)
+            , Element.height (Element.px 180)
+            , Border.rounded 3
+            , Border.glow (Element.rgb255 0 0 0) 0.5
+            , Border.color (Element.rgb255 0 0 0)
+            , Border.solid
+            , Border.width 1
+            ]
+            (cardLink story)
         ]
 
 
@@ -137,8 +154,8 @@ cardLink story =
 card : Story -> Element msg
 card story =
     Element.paragraph
-        [ Border.color (Element.rgb255 150 150 150), Element.spacing 15, Element.paddingEach { top = 10, right = 0, left = 0, bottom = 0 } ]
+        [ Border.color (Element.rgb255 150 150 150), Element.spacing 15, Element.paddingEach { top = 10, right = 5, left = 5, bottom = 5 } ]
         [ Element.el [ Font.size 18, Font.bold ] (Element.text story.title)
-        , Element.el [ Font.italic, Font.size 14 ] (Element.paragraph [ Element.paddingEach { top = 5, right = 0, left = 0, bottom = 0 } ] [ Element.text story.subtitle ])
+        , Element.el [ Font.italic, Font.size 14 ] (Element.paragraph [ Element.paddingEach { top = 5, right = 0, left = 0, bottom = 5 } ] [ Element.text story.subtitle ])
         , Element.el [ Font.size 12 ] (Element.text (String.concat [ "by: ", story.author ]))
         ]

@@ -6226,17 +6226,18 @@ var $author$project$Main$decodeError = function (error) {
 	switch (error.$) {
 		case 0:
 			var string = error.a;
-			return $elm$html$Html$text('Bad url');
+			return $elm$html$Html$text('Error: ' + string);
 		case 1:
 			return $elm$html$Html$text('timeout');
 		case 2:
 			return $elm$html$Html$text('network error');
 		case 3:
 			var _int = error.a;
-			return $elm$html$Html$text('bad status');
+			return $elm$html$Html$text(
+				'Error: ' + $elm$core$String$fromInt(_int));
 		default:
 			var string = error.a;
-			return $elm$html$Html$text('Bad body');
+			return $elm$html$Html$text('Error: ' + string);
 	}
 };
 var $mdgriffith$elm_ui$Internal$Style$classes = {bQ: 'a', au: 'atv', bS: 'ab', bT: 'cx', bU: 'cy', bV: 'acb', bW: 'accx', bX: 'accy', bY: 'acr', aS: 'al', aT: 'ar', bZ: 'at', av: 'ah', aw: 'av', b0: 's', b4: 'bh', b5: 'b', b7: 'w7', b9: 'bd', ca: 'bdt', ak: 'bn', cb: 'bs', al: 'cpe', cg: 'cp', ch: 'cpx', ci: 'cpy', D: 'c', an: 'ctr', ao: 'cb', ap: 'ccx', E: 'ccy', ad: 'cl', aq: 'cr', ck: 'ct', cl: 'cptr', cm: 'ctxt', cu: 'fcs', a0: 'focus-within', cv: 'fs', cx: 'g', aB: 'hbh', aC: 'hc', a5: 'he', aD: 'hf', a6: 'hfp', cz: 'hv', cB: 'ic', cD: 'fr', cF: 'iml', cG: 'imlf', cH: 'imlp', cI: 'implw', cJ: 'it', cK: 'i', bc: 'lnk', X: 'nb', bf: 'notxt', cQ: 'ol', cS: 'or', P: 'oq', cW: 'oh', bj: 'pg', bk: 'p', cX: 'ppe', c$: 'ui', u: 'r', c1: 'sb', c2: 'sbx', c3: 'sby', c4: 'sbt', c7: 'e', c8: 'cap', c9: 'sev', dh: 'sk', p: 't', dk: 'tc', dl: 'w8', dm: 'w2', dn: 'w9', $7: 'tj', at: 'tja', dp: 'tl', dq: 'w3', dr: 'w5', ds: 'w4', dt: 'tr', du: 'w6', dv: 'w1', dw: 'tun', bG: 'ts', S: 'clr', dB: 'u', aO: 'wc', bL: 'we', aP: 'wf', bM: 'wfp', aQ: 'wrp'};
@@ -12034,7 +12035,7 @@ var $author$project$Main$card = function (story) {
 				A3($mdgriffith$elm_ui$Element$rgb255, 150, 150, 150)),
 				$mdgriffith$elm_ui$Element$spacing(15),
 				$mdgriffith$elm_ui$Element$paddingEach(
-				{aV: 0, bb: 0, bw: 0, bE: 10})
+				{aV: 5, bb: 5, bw: 5, bE: 10})
 			]),
 		_List_fromArray(
 			[
@@ -12058,7 +12059,7 @@ var $author$project$Main$card = function (story) {
 					_List_fromArray(
 						[
 							$mdgriffith$elm_ui$Element$paddingEach(
-							{aV: 0, bb: 0, bw: 0, bE: 5})
+							{aV: 5, bb: 0, bw: 0, bE: 5})
 						]),
 					_List_fromArray(
 						[

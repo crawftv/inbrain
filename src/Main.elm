@@ -31,7 +31,7 @@ type Msg
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( {storyList = Loading}
-    , RemoteData.Http.get "http://localhost:8080/random_three" HandleResponse threeDecoder
+    , RemoteData.Http.getWithConfig RemoteData.Http.defaultConfig "http://localhost:8080/random_three" HandleResponse threeDecoder
     )
 
 

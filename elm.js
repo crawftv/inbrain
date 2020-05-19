@@ -5309,6 +5309,19 @@ var $author$project$Main$HandleResponse = function (a) {
 	return {$: 0, a: a};
 };
 var $krisajenkins$remotedata$RemoteData$Loading = {$: 1};
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $ohanhi$remotedata_http$RemoteData$Http$acceptJson = A2($elm$http$Http$header, 'Accept', 'application/json');
+var $ohanhi$remotedata_http$RemoteData$Http$defaultConfig = {
+	a3: _List_fromArray(
+		[$ohanhi$remotedata_http$RemoteData$Http$acceptJson]),
+	Y: false,
+	dy: $elm$core$Maybe$Nothing,
+	bF: $elm$core$Maybe$Nothing
+};
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
 		return {$: 3, a: a, b: b};
@@ -6138,26 +6151,6 @@ var $ohanhi$remotedata_http$RemoteData$Http$getWithConfig = F4(
 	function (config, url, tagger, decoder) {
 		return A6($ohanhi$remotedata_http$RemoteData$Http$request, 'GET', config, url, tagger, decoder, $elm$http$Http$emptyBody);
 	});
-var $elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$http$Http$header = $elm$http$Http$Header;
-var $ohanhi$remotedata_http$RemoteData$Http$acceptJson = A2($elm$http$Http$header, 'Accept', 'application/json');
-var $ohanhi$remotedata_http$RemoteData$Http$defaultConfig = {
-	a3: _List_fromArray(
-		[$ohanhi$remotedata_http$RemoteData$Http$acceptJson]),
-	Y: false,
-	dy: $elm$core$Maybe$Nothing,
-	bF: $elm$core$Maybe$Nothing
-};
-var $ohanhi$remotedata_http$RemoteData$Http$noCache = A2($elm$http$Http$header, 'Cache-Control', 'no-store, must-revalidate, no-cache, max-age=0');
-var $ohanhi$remotedata_http$RemoteData$Http$noCacheConfig = _Utils_update(
-	$ohanhi$remotedata_http$RemoteData$Http$defaultConfig,
-	{
-		a3: A2($elm$core$List$cons, $ohanhi$remotedata_http$RemoteData$Http$noCache, $ohanhi$remotedata_http$RemoteData$Http$defaultConfig.a3)
-	});
-var $ohanhi$remotedata_http$RemoteData$Http$get = $ohanhi$remotedata_http$RemoteData$Http$getWithConfig($ohanhi$remotedata_http$RemoteData$Http$noCacheConfig);
 var $author$project$Main$StoryList = function (storyList) {
 	return {_: storyList};
 };
@@ -6205,7 +6198,7 @@ var $author$project$Main$threeDecoder = A3(
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{_: $krisajenkins$remotedata$RemoteData$Loading},
-		A3($ohanhi$remotedata_http$RemoteData$Http$get, 'http://localhost:8080/random_three', $author$project$Main$HandleResponse, $author$project$Main$threeDecoder));
+		A4($ohanhi$remotedata_http$RemoteData$Http$getWithConfig, $ohanhi$remotedata_http$RemoteData$Http$defaultConfig, 'http://localhost:8080/random_three', $author$project$Main$HandleResponse, $author$project$Main$threeDecoder));
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);

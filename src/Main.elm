@@ -8,7 +8,8 @@ import Html
 import Http
 import Json.Decode as Decode exposing (Decoder, list, string)
 import Json.Decode.Pipeline exposing (required)
-
+import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData.Http
 
 main : Program () Model Msg
 main =
@@ -20,47 +21,29 @@ main =
         }
 
 
-type Model
-    = Failure
-    | Loading
-    | Success StoryList
+type alias Model =
+   { storyList : WebData StoryList }
 
-
-
--- cors : String -> String -> Http.Header
---cors =
---  Http.header "Access-Control-Request-Method" "GET"
-
+type Msg
+    = HandleResponse (WebData StoryList)
+    | GotJson
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Loading
-    , Http.request
-        { body = Http.emptyBody
-        , method = "GET"
-        , headers = []
-        , url = "http://laptop-3qkgiicm:8080/random_three"
-        , expect = Http.expectJson GotJson threeDecoder
-        , timeout = Nothing
-        , tracker = Nothing
-        }
+    ( {storyList = Loading}
+    , RemoteData.Http.get "http://localhost:8080/random_three" HandleResponse threeDecoder
     )
 
 
-type Msg
-    = GotJson (Result Http.Error StoryList)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotJson result ->
-            case result of
-                Ok fullText ->
-                    ( Success fullText, Cmd.none )
-
-                Err _ ->
-                    ( Failure, Cmd.none )
+        GotJson ->
+            ( model,Cmd.none)
+        HandleResponse data ->
+            ( {model | storyList = data}, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -70,9 +53,9 @@ subscriptions model =
 
 view : Model -> Html.Html Msg
 view model =
-    case model of
-        Failure ->
-            Html.text "error"
+    case model.storyList of
+        Failure  error->
+            decodeError error
 
         Loading ->
             Html.text "Loading"
@@ -80,6 +63,22 @@ view model =
         Success fullText ->
             v fullText
 
+        NotAsked ->
+            Html.text "Not Asked"
+
+decodeError : Http.Error -> Html.Html Msg
+decodeError error =
+    case error of
+        Http.BadUrl string ->
+            Html.text "Bad url"
+        Http.Timeout ->
+            Html.text "timeout"
+        Http.NetworkError ->
+            Html.text "network error"
+        Http.BadStatus int ->
+            Html.text "bad status"
+        Http.BadBody string->
+            Html.text "Bad body"
 
 type alias Story =
     { author : String

@@ -3,3 +3,8 @@ elm-stuff
 # elm-repl generated files
 repl-temp-*
 node_modules/
+__pycache__/
+.test-env/
+.venv/
+.dev-env/
+.ipynb_checkpoints/

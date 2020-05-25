@@ -26,6 +26,19 @@ type alias Model =
     { storyList : WebData StoryList }
 
 
+type alias Story =
+    { author : String
+    , title : String
+    , subtitle : String
+    , domain : String
+    , url : String
+    }
+
+
+type alias StoryList =
+    { storyList : List Story }
+
+
 type Msg
     = HandleResponse (WebData StoryList)
     | GotJson
@@ -86,19 +99,6 @@ decodeError error =
 
         Http.BadBody string ->
             Html.text ("Error: " ++ string)
-
-
-type alias Story =
-    { author : String
-    , title : String
-    , subtitle : String
-    , domain : String
-    , url : String
-    }
-
-
-type alias StoryList =
-    { storyList : List Story }
 
 
 threeDecoder : Decoder StoryList

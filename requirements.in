@@ -3,3 +3,9 @@ falcon
 ujson
 waitress
 gunicorn
+flask
+python-dotenv
+requests
+authlib
+python-decouple
+six

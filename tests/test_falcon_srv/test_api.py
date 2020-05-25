@@ -2,11 +2,11 @@
 import falcon
 import pytest
 from falcon import testing
-from srv.api import app
-import srv.api
+from srv_falcon.api import api
+import srv_falcon.api
 import ujson
 from faker import Faker
-from srv.queries import CREATE_STORIES
+from srv_falcon.queries import CREATE_STORIES
 import sqlite3
 
 
@@ -44,14 +44,14 @@ def mock_db():
 
 @pytest.fixture
 def client():
-    return testing.TestClient(app)
+    return testing.TestClient(api)
 
 
 def test_random_three(client, monkeypatch):
     #    sqlite3_execute_mock = mocker.Mock()
     #    sqlite3_mock_conn.return_value = sqlite3_execute_mock
     mock_db()
-    monkeypatch.setattr(srv.api.random_three, "db", "test.db")
+    monkeypatch.setattr(srv_falcon.api.random_three, "db", "test.db")
     response = client.simulate_get("/random_three")
     results = response.json["results"]
     assert response.status == falcon.HTTP_OK

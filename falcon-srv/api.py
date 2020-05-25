@@ -4,7 +4,7 @@ import sqlite3
 import falcon
 import ujson
 
-app = falcon.API()
+api = falcon.API()
 
 
 class RandomThree:
@@ -52,4 +52,4 @@ class RandomThree:
 
 random_three = RandomThree()
 
-app.add_route("/random_three", random_three)
+api.add_route("/random_three", random_three)

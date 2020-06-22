@@ -5,9 +5,10 @@ import Element
 import Element.Border as Border
 import Element.Input as Input
 import Element.Region as Region
-import Http
 import Html
+import Http exposing (Header, header)
 import Json.Encode as Encode
+import RemoteData exposing (RemoteData(..), WebData)
 
 
 type alias Form =
@@ -45,7 +46,9 @@ setFormUrl newUrl form =
 
 
 type alias Model =
-    { form :Form }
+    { form : Form
+    , storySubmitted : Bool
+    }
 
 
 type Msg
@@ -56,6 +59,7 @@ type Msg
     | ChangeUrl String
     | Submit
     | SubmissionComplete (Result Http.Error ())
+
 
 encodeForm : Form -> Encode.Value
 encodeForm form =
@@ -68,28 +72,40 @@ encodeForm form =
         ]
 
 
-submitStoryCmd :Model -> Cmd Msg
+cors : Header
+cors =
+    header "Access-Control-Request-Method" "POST"
+
+
+submitStoryCmd : Model -> Cmd Msg
 submitStoryCmd model =
-    Http.post
-        { url = "http://localhost:5000/api/submit-story"
+    Http.request
+        { method = "POST"
+        , headers = [ cors ]
+        , url = "http://localhost:5000/api/submit-story"
         , body = Http.jsonBody (encodeForm model.form)
         , expect = Http.expectWhatever SubmissionComplete
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
-init: () -> (Model, Cmd msg)
-init flags=
-  ( {form =
-        { storyText = ""
-        , author = ""
-        , title = ""
-        , subtitle = ""
-        , url = ""
-        }
-         }
+init : () -> ( Model, Cmd msg )
+init flags =
+    ( { form =
+            { storyText = ""
+            , author = ""
+            , title = ""
+            , subtitle = ""
+            , url = ""
+            }
+      , storySubmitted = False
+      }
     , Cmd.none
     )
-update : Msg -> Model -> (Model, Cmd Msg)
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeStoryText newStory ->
@@ -100,8 +116,7 @@ update msg model =
                 newForm =
                     oldForm |> setFormStoryText newStory
             in
-            ({ model | form = newForm }, Cmd.none)
-
+            ( { model | form = newForm }, Cmd.none )
 
         ChangeAuthor newAuthor ->
             let
@@ -111,7 +126,7 @@ update msg model =
                 newForm =
                     oldForm |> setFormAuthor newAuthor
             in
-             ({ model | form = newForm }, Cmd.none)
+            ( { model | form = newForm }, Cmd.none )
 
         ChangeTitle newTitle ->
             let
@@ -121,7 +136,7 @@ update msg model =
                 newForm =
                     oldForm |> setFormTitle newTitle
             in
-            ( { model | form = newForm },Cmd.none)
+            ( { model | form = newForm }, Cmd.none )
 
         ChangeSubtitle newSubtitle ->
             let
@@ -141,27 +156,37 @@ update msg model =
                 newForm =
                     oldForm |> setFormUrl newUrl
             in
-            ( { model | form = newForm },Cmd.none)
+            ( { model | form = newForm }, Cmd.none )
 
         Submit ->
-            ( model, submitStoryCmd model)
+            ( { model | storySubmitted = True }, submitStoryCmd model )
+
         SubmissionComplete result ->
             case result of
-                Ok res->
-                    (model, Cmd.none)
-                Err err->
-                    (model, Cmd.none)
+                Ok res ->
+                    ( model, Cmd.none )
+
+                Err err ->
+                    ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+    Sub.none
 
 
-view : Model-> Browser.Document Msg
+view : Model -> Browser.Document Msg
 view model =
-    {title = "Submit a Story"
-    , body = [Element.layout [] (viewForm model.form)]
-           }
+    { title = "Submit a Story"
+    , body =
+        case model.storySubmitted of
+            False ->
+                [ Element.layout [] (viewForm model.form) ]
+
+            -- [Element.layout [] (Element.column [] [(Element.text (Debug.toString model)) , (viewForm model.form)]) ]
+            True ->
+                [ Element.layout [] (Element.text "Story Submitted") ]
+    }
 
 
 viewForm form =
@@ -202,6 +227,7 @@ viewForm form =
             , label = Element.text "Submit Story"
             }
         ]
+
 
 main =
     Browser.document

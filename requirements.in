@@ -1,7 +1,3 @@
-cython
-falcon
-ujson
-waitress
 gunicorn
 flask
 python-dotenv

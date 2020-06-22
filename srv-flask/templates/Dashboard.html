@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+
+  <script type="text/javascript" src={{url_for('static', filename="dashboard.js")}}></script>-->
+</head>
+
+<body>
+    <div id="myapp"></div>
+</body>
+
+<script type="text/javascript">
+
+// Start the Elm application.
+var app = Elm.Dashboard.init({
+    node: document.getElementById('myapp')
+});
+
+// When a message comes into our WebSocket, we pass the message along
+// to the `messageReceiver` port.
+  app.ports.messageReceiver.send( {{ profile | tojson }} )
+</script>
+
+</html>

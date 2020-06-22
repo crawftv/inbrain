@@ -15,13 +15,14 @@ from flask import url_for
 from authlib.integrations.flask_client import OAuth
 from decouple import config
 from six.moves.urllib.parse import urlencode
-from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
 app.secret_key = config("SECRET_KEY")
+
+### OAUTH
 oauth = OAuth(app)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 auth0 = oauth.register(
     "auth0",
     client_id=config("CLIENT_ID"),
@@ -31,6 +32,7 @@ auth0 = oauth.register(
     authorize_url=config("AUTHORIZE_URL"),
     client_kwargs={"scope": "openid profile email",},
 )
+
 # Here we're using the /callback route.
 @app.route("/callback")
 def callback_handling():
@@ -67,14 +69,6 @@ def requires_auth(f):
     return decorated
 
 
-@app.route("/dashboard")
-@requires_auth
-def dashboard():
-    userinfo = (session["profile"],)
-    userinfo_pretty = (json.dumps(session["jwt_payload"], indent=4),)
-    return jsonify({"userinfo": userinfo, "userinfo_pretty": userinfo_pretty})
-
-
 @app.route("/logout")
 def logout():
     # Clear session stored data
@@ -82,20 +76,42 @@ def logout():
     # Redirect user to logout endpoint
     params = {
         "returnTo": url_for("home", _external=True),
-        "client_id": "4VGU7s0h5XDp9zFqn1fvEdiDJ6whIx95",
+        "client_id": config("CLIENT_ID"),
     }
     return redirect(auth0.api_base_url + "/v2/logout?" + urlencode(params))
 
 
+### Home
 @app.route("/")
 def home():
     return jsonify("Home")
 
-@app.route("/api/submit-story", methods=["POST"])
+
+### Dashboard
+@app.route("/dashboard")
+@requires_auth
+def dashboard():
+    profile = {}
+    userinfo = session["profile"]
+    profile["name"] = userinfo["name"]
+    return render_template("dashboard.html", profile=json.dumps(profile ))
+
+
+### Submit Story
+@app.route("/submit-story")
+@requires_auth
 def submit_story():
+    return render_template("submitStory.html")
+
+
+@app.route("/api/submit-story", methods=["POST"])
+@requires_auth
+def api_submit_story():
     app.logger.info("Success")
     app.logger.info(request.json)
+    app.logger.info(session["profile"])
     return jsonify("success")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     app.run()
